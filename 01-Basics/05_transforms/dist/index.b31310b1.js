@@ -467,12 +467,13 @@ const size = {
     height: 600
 };
 scene = new _three.Scene();
-const geo = new _three.BoxGeometry(1, 1, 1);
+const geo = new _three.BoxGeometry(0.5, 0.5, 0.5);
 const material = new _three.MeshBasicMaterial({
     color: 16711680
 });
 mesh = new _three.Mesh(geo, material);
-mesh.position.x = 0;
+mesh.position.z = -3;
+mesh.rotation.x = 4;
 scene.add(mesh);
 //CAMERA
 //	|
@@ -480,6 +481,7 @@ scene.add(mesh);
 camera = new _three.PerspectiveCamera(35, size.width / size.height);
 camera.position.z = 3;
 scene.add(camera);
+console.log(mesh.position.normalize());
 //RENDERER
 //	|
 //	v

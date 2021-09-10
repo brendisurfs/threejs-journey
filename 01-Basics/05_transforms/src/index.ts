@@ -15,20 +15,27 @@ const size = {
 
 scene = new THREE.Scene();
 
-const geo = new THREE.BoxGeometry(1, 1, 1);
+const geo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
 const material = new THREE.MeshBasicMaterial({
     color: 0xff0000,
 });
 mesh = new THREE.Mesh(geo, material);
-mesh.position.x = 0;
+{
+    mesh.position.z = -3;
+    mesh.rotation.x = 4;
+}
 scene.add(mesh);
 
 //CAMERA
 //	|
 //	v
 camera = new THREE.PerspectiveCamera(35, size.width / size.height);
-camera.position.z = 3;
-scene.add(camera);
+{
+    camera.position.z = 3;
+    scene.add(camera);
+}
+
+console.log(mesh.position.normalize());
 
 //RENDERER
 //	|
@@ -36,5 +43,7 @@ scene.add(camera);
 renderer = new THREE.WebGLRenderer({
     canvas,
 });
-renderer.setSize(size.width, size.height);
-renderer.render(scene, camera);
+{
+    renderer.setSize(size.width, size.height);
+    renderer.render(scene, camera);
+}
