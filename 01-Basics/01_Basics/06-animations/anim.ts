@@ -1,10 +1,22 @@
 import * as THREE from "three";
-
+import "../06-animations/style.css";
 const canvas = document.querySelector("canvas.webgl");
+
 const sizes = {
-    height: 800,
-    width: 1200,
+    height: window.innerHeight,
+    width: window.innerWidth,
 };
+
+window.addEventListener("resize", () => {
+    // update sizes
+    sizes.width = window.innerWidth;
+    sizes.height = window.innerHeight;
+    camera.aspect = sizes.width / sizes.height;
+    camera.updateProjectionMatrix();
+
+    // we put renderer.setSize here and with our renderer
+    renderer.setSize(sizes.width, sizes.height);
+});
 
 //CURSOR
 //	|
@@ -13,13 +25,13 @@ const cursorLocation = {
     x: 0,
     y: 0,
 };
+
 window.addEventListener("mousemove", (event: any) => {
     // clientX and clientY
     // usually we want a range from -1 to 1
 
     cursorLocation.x = event.clientX / sizes.width - 0.5;
-    cursorLocation.y = event.clientY / sizes.height - 0.5;
-    console.log(cursorLocation);
+    cursorLocation.y = -(event.clientY / sizes.height - 0.5);
 });
 
 const scene = new THREE.Scene();
@@ -30,9 +42,6 @@ const scene = new THREE.Scene();
 const geo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
 const mats = new THREE.MeshNormalMaterial();
 const mesh = new THREE.Mesh(geo, mats);
-{
-    mesh.position.z = -1;
-}
 
 scene.add(mesh);
 
@@ -46,14 +55,13 @@ const camera = new THREE.PerspectiveCamera(
     0.1,
     100
 );
-{
-    camera.position.z = 5;
-    scene.add(camera);
-}
+// update camera
+
+camera.position.z = -5;
+scene.add(camera);
 
 // ORTHO CAMERA
 const aspectRatio = sizes.width / sizes.height;
-console.log(aspectRatio);
 
 const orthoCamera = new THREE.OrthographicCamera(
     -1 * aspectRatio,
@@ -64,13 +72,17 @@ const orthoCamera = new THREE.OrthographicCamera(
     100
 );
 
+// creating controls
+// const controls = new OrbitControls(camera, canvas);
+
 const renderer = new THREE.WebGLRenderer({
     canvas,
+    antialias: true,
 });
-{
-    renderer.setSize(sizes.width, sizes.height);
-}
-let time = Date.now();
+
+renderer.setSize(sizes.width, sizes.height);
+// use this for performance balancing.
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 //GSAP ANIMATION
 //	|
@@ -84,11 +96,11 @@ let time = Date.now();
 (function tick() {
     // update objects
     let current = Date.now();
-    let delta = current - time;
-    time = current;
-    // mesh.rotation.y += 0.001 * delta;
-    // mesh.rotation.x += 0.001 * delta;
+
+    camera.position.x = Math.sin(cursorLocation.x * Math.PI);
+    camera.position.y = Math.cos(cursorLocation.y * Math.PI);
     camera.lookAt(mesh.position);
+
     //render
     renderer.render(scene, camera);
     window.requestAnimationFrame(tick);
