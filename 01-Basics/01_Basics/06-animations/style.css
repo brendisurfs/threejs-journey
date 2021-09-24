@@ -1,15 +1,15 @@
 html,
 body {
-    margin: 0;
-    padding: 0;
-    /* this will prevent overscrolling on interactive DEs like macos */
-    overflow: hidden;
+	margin: 0;
+	padding: 0;
+	/* this will prevent overscrolling on interactive DEs like macos */
+	overflow: hidden;
 }
 .webgl {
-    /* this may also remove scrollbar */
-    position: fixed;
-    left: 0;
-    right: 0;
-    /* this will get ride of any outline */
-    outline: none;
+	/* this may also remove scrollbar */
+	position: fixed;
+	left: 0;
+	right: 0;
+	/* this will get ride of any outline */
+	outline: none;
 }
