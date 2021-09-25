@@ -1,13 +1,41 @@
 import * as THREE from 'three'
 import { BufferAttribute } from 'three'
 import '../06-animations/style.css'
-const canvas = document.querySelector('canvas.webgl')
+import * as dat from 'dat.gui'
+
+// DEBUG
+// DEBUG
+// DEBUG
+const debugGUI = new dat.GUI()
+
+const debugObject = {
+    color: 0xff0000,
+}
+debugGUI.addColor(debugObject, 'color').onChange(() => {
+    mats.color.set(debugObject.color)
+})
+
+const MESH_DEFAULT_VISIBILITY = true
+
+/* 
+DOM and canvas section
+|
+|
+|
+|
+*/
+const canvas: Element =
+    document.querySelector('canvas.webgl')
 
 const sizes = {
     height: window.innerHeight,
     width: window.innerWidth,
 }
-
+/* 
+RESIZE WINDOW ACTIONS
+*
+*
+*/
 window.addEventListener('resize', () => {
     // update sizes
     sizes.width = window.innerWidth
@@ -48,16 +76,20 @@ const scene = new THREE.Scene()
 //OBJ
 //	|
 //	v
-const geo = new THREE.BoxGeometry(0.5, 0.5, 0.5)
-
-// float32 array info
-const positionsArray = new Float32Array([
-    0, 0, 0, 0, 1, 0, 1, 0, 0,
-])
-const posAttrib = new THREE.BufferAttribute(
-    positionsArray,
-    3,
+const geo: THREE.BoxGeometry = new THREE.BoxGeometry(
+    0.5,
+    0.5,
+    0.5,
 )
+const gridGeo = new THREE.PlaneGeometry(2, 2, 2)
+// float32 array info
+// const positionsArray: Float32Array = new Float32Array([
+// 0, 0, 0, 0, 1, 0, 1, 0, 0,
+// ])
+// const posAttrib = new THREE.BufferAttribute(
+// positionsArray,
+// 3,
+// )
 
 const geometry = new THREE.BufferGeometry()
 
@@ -78,11 +110,26 @@ geometry.computeVertexNormals()
 // geometry.setAttribute('position', posAttrib)
 // why 9? fill array with values, its xyz coords!
 
-const mats = new THREE.MeshBasicMaterial({
-    wireframe: true,
-})
-const mesh = new THREE.Mesh(geometry, mats)
+const mats = new THREE.MeshBasicMaterial()
+const gridmesh = new THREE.Mesh(gridGeo, mats)
+gridmesh.rotation.x = -1.5
+gridmesh.position.y = -0.5
+const mesh = new THREE.Mesh(geo, mats)
+mesh.visible = MESH_DEFAULT_VISIBILITY
+
+// INFO: GUI DEBUG
+debugGUI.add(mesh, 'visible')
+debugGUI
+    .add(mesh.position, 'y')
+    .min(-1)
+    .max(1)
+    .step(0.01)
+    .name('elevation')
+
+// SCENE
 scene.add(mesh)
+
+scene.add(gridmesh)
 
 //CAMERA/RENDER
 //	|
