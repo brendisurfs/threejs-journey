@@ -1,29 +1,22 @@
 import * as THREE from 'three'
-import { BufferAttribute } from 'three'
 import '../06-animations/style.css'
 import * as dat from 'dat.gui'
 
-// DEBUG
-// DEBUG
-// DEBUG
+//DEBUG INIT
+//	|
+//	v
 const debugGUI = new dat.GUI()
 
 const debugObject = {
     color: 0xff0000,
 }
+
 debugGUI.addColor(debugObject, 'color').onChange(() => {
-    mats.color.set(debugObject.color)
+    console.log('change!')
 })
 
 const MESH_DEFAULT_VISIBILITY = true
 
-/* 
-DOM and canvas section
-|
-|
-|
-|
-*/
 const canvas: Element =
     document.querySelector('canvas.webgl')
 
@@ -32,9 +25,9 @@ const sizes = {
     width: window.innerWidth,
 }
 /* 
-RESIZE WINDOW ACTIONS
 *
 *
+----------------------WINDOW----------------------
 */
 window.addEventListener('resize', () => {
     // update sizes
@@ -55,7 +48,7 @@ window.addEventListener('dblclick', () => {
     }
 })
 
-//CURSOR
+//	----------------CURSOR---------------------
 //	|
 //	v HOW to get the coordinates of the mouse
 const cursorLocation = {
@@ -64,16 +57,26 @@ const cursorLocation = {
 }
 
 window.addEventListener('mousemove', (event: any) => {
-    // clientX and clientY
-    // usually we want a range from -1 to 1
-
     cursorLocation.x = event.clientX / sizes.width - 0.5
     cursorLocation.y = -(event.clientY / sizes.height - 0.5)
 })
 
 const scene = new THREE.Scene()
 
-//OBJ
+/*
+ *
+ *
+ * v-------------------TEXTURES----------------------v
+ * |
+ * |
+ * v
+ */
+const textureLoader = new THREE.TextureLoader()
+const texture = textureLoader.load(
+    '/06-animations/vefmeccn_4K_Albedo.jpg',
+)
+
+//------------------------OBJ----------------------
 //	|
 //	v
 const geo: THREE.BoxGeometry = new THREE.BoxGeometry(
@@ -90,7 +93,6 @@ const gridGeo = new THREE.PlaneGeometry(2, 2, 2)
 // positionsArray,
 // 3,
 // )
-
 const geometry = new THREE.BufferGeometry()
 
 let count = 50
@@ -106,18 +108,22 @@ const positionAttribute = new THREE.BufferAttribute(
 
 geometry.setAttribute('position', positionAttribute)
 geometry.computeVertexNormals()
-// takes string attribute: position is one of the attribs
 // geometry.setAttribute('position', posAttrib)
-// why 9? fill array with values, its xyz coords!
 
-const mats = new THREE.MeshBasicMaterial()
+const mats = new THREE.MeshBasicMaterial({
+    map: texture,
+})
 const gridmesh = new THREE.Mesh(gridGeo, mats)
 gridmesh.rotation.x = -1.5
 gridmesh.position.y = -0.5
 const mesh = new THREE.Mesh(geo, mats)
 mesh.visible = MESH_DEFAULT_VISIBILITY
 
-// INFO: GUI DEBUG
+/*
+ *
+ *
+ * v-------------------GUI DEBUG ADDITIONS----------------------v
+ */
 debugGUI.add(mesh, 'visible')
 debugGUI
     .add(mesh.position, 'y')
@@ -126,15 +132,19 @@ debugGUI
     .step(0.01)
     .name('elevation')
 
-// SCENE
+// ============================================================>
+// #NOTE: ADD MESH TO SCENE
 scene.add(mesh)
-
 scene.add(gridmesh)
 
-//CAMERA/RENDER
-//	|
-//	v
-
+/*
+ *
+ *
+ * v-------------------CAMERA + RENDERER----------------------v
+ * |
+ * |
+ * v
+ */
 const camera = new THREE.PerspectiveCamera(
     45,
     sizes.width / sizes.height,
@@ -142,7 +152,6 @@ const camera = new THREE.PerspectiveCamera(
     100,
 )
 // update camera
-
 camera.position.z = -5
 scene.add(camera)
 
@@ -158,9 +167,6 @@ const orthoCamera = new THREE.OrthographicCamera(
     100,
 )
 
-// creating controls
-// const controls = new OrbitControls(camera, canvas);
-
 const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
@@ -170,19 +176,9 @@ renderer.setSize(sizes.width, sizes.height)
 // use this for performance balancing.
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-//GSAP ANIMATION
-//	|
-//	v
-// moving with gsap
-// gsap.to(mesh.position, {
-// duration: 1, delay: 1, x: 2
-// })
-
-// ANIMATIONS
+// RENDER LOOP
 ;(function tick() {
     // update objects
-    let current = Date.now()
-
     camera.position.x = Math.sin(cursorLocation.x * Math.PI)
     camera.position.y = Math.cos(cursorLocation.y * Math.PI)
     camera.lookAt(mesh.position)
